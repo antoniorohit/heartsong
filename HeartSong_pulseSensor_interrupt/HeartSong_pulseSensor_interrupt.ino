@@ -8,6 +8,12 @@
 #include "Adafruit_GFX.h"
 #include "LPD8806.h"
 #include "SPI.h" 
+#include <Adafruit_NeoPixel.h>
+
+#define BRIGHTNESS  128
+#define PIXEL_PIN    6    // Digital IO pin connected to the NeoPixels.
+#define PIXEL_COUNT 16
+
 #ifdef __AVR_ATtiny85__
 #include <avr/power.h>
 #endif
@@ -61,13 +67,23 @@ long interval1 = 60;
 
 // THIS IS CODE FOR NEOPIX STRAND
 // Number of RGB LEDs in strand:
-int nLEDs = 4;
+int nLEDs = 7;
 // Chose 2 pins for output; can be any valid output pins:
 int dataPin  = 9; //green
 int clockPin = 10; //orange
 //on flora, power goes to vBatt
 
-LPD8806 strip = LPD8806(nLEDs, dataPin, clockPin);
+//LPD8806 strip = LPD8806(nLEDs, dataPin, clockPin);
+
+// Parameter 1 = number of pixels in strip,  neopixel stick has 8
+// Parameter 2 = pin number (most are valid)
+// Parameter 3 = pixel type flags, add together as needed:
+//   NEO_RGB     Pixels are wired for RGB bitstream
+//   NEO_GRB     Pixels are wired for GRB bitstream, correct for neopixel stick
+//   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
+//   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip), correct for neopixel stick
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
 
 void setup() {
   pinMode(blinkPin,OUTPUT);         // Pulse Sensor pin that will blink to your heartbeat!
@@ -99,18 +115,18 @@ uint32_t Wheel(uint16_t WheelPos)
   switch(WheelPos / 128)
   {
   case 0:
-    r = 127 - WheelPos % 128;   //Red down
-    g = WheelPos % 128;      // Green up
+    r = BRIGHTNESS - 1 - WheelPos % BRIGHTNESS;   //Red down
+    g = WheelPos % BRIGHTNESS;      // Green up
     b = 0;                  //blue off
     break; 
   case 1:
-    g = 127 - WheelPos % 128;  //green down
-    b = WheelPos % 128;      //blue up
+    g = BRIGHTNESS - 1 - WheelPos % BRIGHTNESS;  //green down
+    b = WheelPos % BRIGHTNESS;      //blue up
     r = 0;                  //red off
     break; 
   case 2:
-    b = 127 - WheelPos % 128;  //blue down 
-    r = WheelPos % 128;      //red up
+    b = BRIGHTNESS - 1 - WheelPos % BRIGHTNESS;  //blue down 
+    r = WheelPos % BRIGHTNESS;      //red up
     g = 0;                  //green off
     break; 
   }
