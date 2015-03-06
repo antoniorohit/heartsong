@@ -8,9 +8,10 @@
 #include "Adafruit_GFX.h"
 #include "LPD8806.h"
 #include "SPI.h" 
+#include <Adafruit_NeoPixel.h>
+
 #ifdef __AVR_ATtiny85__
 #include <avr/power.h>
-#include <Adafruit_NeoPixel.h>
 #endif
 //Definitions  
 // Calc BPM
