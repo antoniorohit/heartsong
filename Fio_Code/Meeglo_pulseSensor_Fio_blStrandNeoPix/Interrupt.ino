@@ -28,7 +28,7 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
   Signal = analogRead(pulsePin);              // read the Pulse Sensor 
   sampleCounter += 2;                         // keep track of the time in mS with this variable
   N = sampleCounter - lastBeatTime;       // monitor the time since the last beat to avoid noise
-  Serial.println(Signal);
+  //Serial.println(Signal);
 
     //  find the peak and trough of the pulse wave
   if(Signal < thresh && N > (IBI/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI

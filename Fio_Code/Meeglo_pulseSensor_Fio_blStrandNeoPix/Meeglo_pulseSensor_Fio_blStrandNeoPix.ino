@@ -54,14 +54,16 @@ boolean HRVUp = false;
 float cFloat = 316.0;
 
 
-//Animation
-//long currentMillis // assigned this in loop... 
-long previousMillis = 0;
-long interval1 = 60;
+int buttonState = 0;  //current state of the button
+int lastButtonState = 1; //previous state
+long interval = 60000;
+long previousMillis = 0; 
+boolean buzzflag = false;
 
 void setup() {
   pinMode(blinkPin,OUTPUT);         // Pulse Sensor pin that will blink to your heartbeat!
   pinMode(fadePin,OUTPUT);          // Pulse Sensor pin that will fade to your heartbeat!
+  pinMode (2, INPUT_PULLUP); //Button 1
   Serial.begin(115200);
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS 
   pixels.begin(); // This initializes the NeoPixel library for neopix not strand or trinket
@@ -69,8 +71,68 @@ void setup() {
 
 
 void loop() {
-    HRV(); //as soon as this is enabled (this is LED fade to BPM up/down), stops printing BPM to serial
-}
+  HRV(); //as soon as this is enabled (this is LED fade to BPM up/down), stops printing BPM to serial
+  buttonState = digitalRead(2);
+  unsigned long currentMillis = millis();
+  int i;
+  if (buttonState != lastButtonState) { //compare to previous
+    if (buttonState == LOW) { //it is 0 when clicked
+      Serial.print("start timer");
+      buzzflag = true;
+      previousMillis = millis();
+      //Serial.println(buttonPushCounter);   
+      //white flash twice
+      for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(0,0,0));
+      }
+      pixels.show();   // write all the pixels out
+      delay(100);  
+      for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(200,200,200));
+      }
+      pixels.show();   // write all the pixels out
+      delay(500);  
+      //dark
+      for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(0,0,0));
+      }
+      pixels.show();   // write all the pixels out
+      delay(150);  
+      //white
+      for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(200,200,200));
+      }
+      pixels.show();   // write all the pixels out
+      delay(700);  
+    }
+    lastButtonState = buttonState;
+  } 
+  if((currentMillis - previousMillis) > interval){
+    if(buzzflag) {
+      Serial.println("BAM");
+           //white flash twice
+      for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(200,200,200));
+      }
+      pixels.show();   // write all the pixels out
+      delay(300);  
+      //dark
+      for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(0,0,0));
+      }
+      pixels.show();   // write all the pixels out
+      delay(150);  
+      //white
+      for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(200,200,200));
+      }
+      pixels.show();   // write all the pixels out
+      delay(1000); 
+    }
+      buzzflag = false;
+    }
+  }
+
 
 
 /* Helper functions */
@@ -101,6 +163,9 @@ uint32_t Wheel(uint16_t WheelPos)
   }
   return(pixels.Color(r,g,b));
 }
+
+
+
 
 
 
