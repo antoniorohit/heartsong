@@ -1,6 +1,6 @@
 /*
  Lark Buckingham
- //CODE FOR ARDUINO UNO with Trinket Jewel
+ //CODE FOR ARDUINO UNO with black stran
  Tried adding pulseSensor code -- get BPM to print but only from within interrupt....
  Adapted from PulseSensor code and Heart Badge by Becky Stern for Adafruit Industries
  Based on sample code from http://learn.parallax.com/KickStart/28048
@@ -92,6 +92,7 @@ int clockPin = 10; //orange
 
 
 void setup() {
+  pinMode(2, INPUT_PULLUP);
   pinMode(blinkPin,OUTPUT);         // Pulse Sensor pin that will blink to your heartbeat!
   pinMode(fadePin,OUTPUT);          // Pulse Sensor pin that will fade to your heartbeat!
   Serial.begin(19200);
@@ -101,13 +102,17 @@ void setup() {
 
 
 void loop() {
-  //if((lastBPM != BPM)){
-    //Serial.print("BPM = ");
-    //Serial.println(BPM/2);
     HRV(); //as soon as this is enabled (this is LED fade to BPM up/down), stops printing BPM to serial
-  //}
-  lastBPM = BPM;
- Serial.println(BPM);
+    buttonState = digitalRead(2);
+    Serial.println(buttonState);
+    if (buttonState != lastButtonState) { 
+      if (buttonState == LOW) {
+        Serial.println("START TIMER");
+      }
+      lastButtonState = buttonState;
+    }
+    lastBPM = BPM;
+ //Serial.println(BPM);
 }
 
 

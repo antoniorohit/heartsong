@@ -11,34 +11,35 @@ void HRV() {
     }
   }
 
-  if (HRVUp == true){ //set
-    for (i=0; i < pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel(c % 384));
-    }
-     cFloat = cFloat + .05;
+  if (HRVUp == true){ 
+     cFloat += 0.05;
     if(cFloat > 383){
       cFloat = 383;
     }
-    //constrain(cFloat, 250, 383);
-    c = (int) cFloat;
-    pixels.show();   // write all the pixels out  
   }
-  else if (HRVUp == false){
+  else 
+  {
+     cFloat -= 0.05;
+     if(cFloat < 256){
+      cFloat = 256;
+    }
+  }
     for (i=0; i < pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel(c % 384));
+      pixels.setPixelColor(i, Wheel(((int)cFloat) % 384));
     }
-     cFloat = cFloat - .05;
-     if(cFloat < 250){
-      cFloat = 250;
-    }
-    //constrain(cFloat, 250, 383);
-    c = (int) cFloat;
-    pixels.show();   // write all the pixels out
-  }
-  //Serial.println(HRVUp);
-  //Serial.println(c);
-  lastBPM = BPM;
+    pixels.show();   // write all the pixels out  
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
