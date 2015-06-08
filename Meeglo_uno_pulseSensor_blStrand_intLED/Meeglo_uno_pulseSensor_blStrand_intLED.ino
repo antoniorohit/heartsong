@@ -11,6 +11,8 @@
 #include "SPI.h" 
 #include <Adafruit_NeoPixel.h>
 #define BRIGHTNESS  128
+#include "Adafruit_DRV2605.h"
+Adafruit_DRV2605 drv;
 
 // Which pin on the Arduino is connected to the NeoPixels?
 #define PIN            9
@@ -53,10 +55,15 @@ volatile boolean QS = false;        // becomes true when Arduoino finds a beat.
 //button variables
 int buttonPushCounter = 0; // counter for number of button presses
 int buttonState = 0;  //current state of the button
-int lastButtonState = 0; //previous state
+int lastButtonState = 1; //previous state
 int buttonPushCounter2 = 0; // counter for number of button presses
 int buttonState2 = 0;  //current state of the button
 int lastButtonState2 = 0; //previous state
+long interval = 200;
+long interval2 = 1000; 
+long interval3 = 60000;
+long previousMillis = 0; 
+boolean buzzflag = false;
 
 //This is for HRV fade
 boolean HRVUp = false;
@@ -66,8 +73,8 @@ int c= 316; //color wheel seed
 
 //Animation
 //long currentMillis // assigned this in loop... 
-long previousMillis = 0;
-long interval1 = 60;
+//long previousMillis = 0;
+//long interval1 = 60;
 
 
 
@@ -92,27 +99,59 @@ int clockPin = 10; //orange
 
 
 void setup() {
-  pinMode(2, INPUT_PULLUP);
+  pinMode(2, INPUT_PULLUP);        //for heptatic
   pinMode(blinkPin,OUTPUT);         // Pulse Sensor pin that will blink to your heartbeat!
   pinMode(fadePin,OUTPUT);          // Pulse Sensor pin that will fade to your heartbeat!
   Serial.begin(19200);
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS 
- pixels.begin(); // This initializes the NeoPixel library for neopix not strand or trinket
+  pixels.begin(); // This initializes the NeoPixel library for neopix not strand or trinket
+  drv.begin();
+  drv.selectLibrary(1);
+  drv.setMode(DRV2605_MODE_INTTRIG); 
 }
 
 
 void loop() {
     HRV(); //as soon as this is enabled (this is LED fade to BPM up/down), stops printing BPM to serial
     buttonState = digitalRead(2);
-    Serial.println(buttonState);
+    lastBPM = BPM;
+  /// Serial.println(BPM);
+    unsigned long currentMillis = millis();
     if (buttonState != lastButtonState) { 
+       Serial.println("START");
+      Serial.println(buttonState);
       if (buttonState == LOW) {
         Serial.println("START TIMER");
+        buzzflag = true;
+        previousMillis = millis();
+        Serial.println("button state");
+        Serial.println(buttonState);
+        Serial.println(previousMillis);
+        
       }
       lastButtonState = buttonState;
     }
-    lastBPM = BPM;
- //Serial.println(BPM);
+    if((currentMillis - previousMillis) > interval && (currentMillis - previousMillis) < interval2){  
+      if(buzzflag) {
+        // Serial.println("In here");
+         drv.setWaveform(1, 86);  // play effect 
+         drv.setWaveform(2, 0);       // end waveform
+         drv.go();  //
+      } 
+    }
+   if( (currentMillis - previousMillis) >= interval3)  {
+      if(buzzflag) {
+      Serial.println("BAM");
+       Serial.println((currentMillis - previousMillis));
+       drv.setWaveform(1, 86);  // play effect 
+       drv.setWaveform(2, 0);       // end waveform
+       drv.go();  //
+    }
+     buzzflag = false;
+    }
+   
+   
+  
 }
 
 

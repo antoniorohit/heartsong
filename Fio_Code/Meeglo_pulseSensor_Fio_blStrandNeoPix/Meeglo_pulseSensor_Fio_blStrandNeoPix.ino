@@ -28,7 +28,6 @@ volatile unsigned long lastpulsetime = 0; // For HRpulseArray: used to find IBI
 int BPM, lastBPM, BPMforDisplay;
 int HRV_Value;
 unsigned long iterationCounter;
-int animationPosition = 0;
 byte oldSample, sample;
 long pulsetime;// , lastpulsetime;
 
@@ -56,7 +55,7 @@ float cFloat = 316.0;
 
 int buttonState = 0;  //current state of the button
 int lastButtonState = 1; //previous state
-long interval = 60000;
+long interval = 120000;
 long previousMillis = 0; 
 boolean buzzflag = false;
 
@@ -86,12 +85,12 @@ void loop() {
         pixels.setPixelColor(i, pixels.Color(0,0,0));
       }
       pixels.show();   // write all the pixels out
-      delay(100);  
+      delay(150);  
       for (i=0; i < pixels.numPixels(); i++) {
         pixels.setPixelColor(i, pixels.Color(200,200,200));
       }
       pixels.show();   // write all the pixels out
-      delay(500);  
+      delay(700);  
       //dark
       for (i=0; i < pixels.numPixels(); i++) {
         pixels.setPixelColor(i, pixels.Color(0,0,0));
@@ -103,10 +102,17 @@ void loop() {
         pixels.setPixelColor(i, pixels.Color(200,200,200));
       }
       pixels.show();   // write all the pixels out
-      delay(700);  
+      delay(700);
+          for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(0,0,0));
+      }
+      pixels.show();   // write all the pixels out
+      delay(250);   
     }
     lastButtonState = buttonState;
   } 
+ 
+      
   if((currentMillis - previousMillis) > interval){
     if(buzzflag) {
       Serial.println("BAM");
@@ -115,7 +121,7 @@ void loop() {
         pixels.setPixelColor(i, pixels.Color(200,200,200));
       }
       pixels.show();   // write all the pixels out
-      delay(300);  
+      delay(700);  
       //dark
       for (i=0; i < pixels.numPixels(); i++) {
         pixels.setPixelColor(i, pixels.Color(0,0,0));
@@ -128,6 +134,11 @@ void loop() {
       }
       pixels.show();   // write all the pixels out
       delay(1000); 
+            for (i=0; i < pixels.numPixels(); i++) {
+        pixels.setPixelColor(i, pixels.Color(0,0,0));
+      }
+      pixels.show();   // write all the pixels out
+      delay(2000);  
     }
       buzzflag = false;
     }
