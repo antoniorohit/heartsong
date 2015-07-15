@@ -1,6 +1,4 @@
 void HRV() {
-  
-
   int i;
   if (BPM != lastBPM){ 
      if(BPM > lastBPM){

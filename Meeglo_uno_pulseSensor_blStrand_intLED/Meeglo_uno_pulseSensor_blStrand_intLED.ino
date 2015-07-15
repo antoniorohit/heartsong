@@ -5,6 +5,7 @@
  Adapted from PulseSensor code and Heart Badge by Becky Stern for Adafruit Industries
  Based on sample code from http://learn.parallax.com/KickStart/28048
  */
+#include <SD.h>
 #include <Wire.h>
 #include "Adafruit_GFX.h"
 #include "LPD8806.h"
@@ -39,7 +40,7 @@ long pulsetime;// , lastpulsetime;
 //PULSE SENSOR CODE
 //  VARIABLES
 int pulsePin = 0;                 // Pulse Sensor purple wire connected to analog pin 0
-int blinkPin = 13;                // pin to blink led at each beat
+int blinkPin = 7;                // pin to blink led at each beat
 int fadePin = 5;                  // pin to do fancy classy fading blink at each beat
 int fadeRate = 0;                 // used to fade LED on with PWM on fadePin
 
@@ -97,6 +98,12 @@ int clockPin = 10; //orange
 //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip), correct for neopixel stick
 //Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
+//Stuff for sd logging
+const int chipSelect = 10;
+long lastReadTime = 0;        // the last time you read the sensor, in ms
+const int record_interval = 1*1000; // the interval between sensor reads, in ms--> every 3 seconds-> will get 300 readings in 3 minutes
+String todaysdate = "Jul142014"; //just forcing this, we need an extra chip or be able to sync to a computer or over wifi to get the real time.
+int lastbpmcopy;
 
 void setup() {
   pinMode(2, INPUT_PULLUP);        //for heptatic
@@ -108,6 +115,13 @@ void setup() {
   drv.begin();
   drv.selectLibrary(1);
   drv.setMode(DRV2605_MODE_INTTRIG); 
+    Serial.print("Initializing SD card...");
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    return;
+  }
+  Serial.println("card initialized.");
 }
 
 
@@ -115,7 +129,25 @@ void loop() {
     HRV(); //as soon as this is enabled (this is LED fade to BPM up/down), stops printing BPM to serial
     buttonState = digitalRead(2);
     lastBPM = BPM;
-  /// Serial.println(BPM);
+    ///lastbpmcopy = lastBPM;
+    long currentTimeFile = millis();
+    long elapsedFile = record_interval +  lastReadTime;
+    if (currentTimeFile > elapsedFile) {
+     String dataString = todaysdate+"," + String(currentTimeFile)+","+ String(lastBPM);
+     //files don't overwrite; just appends data.
+     File dataFile = SD.open("datalog7.txt", FILE_WRITE);
+     if (dataFile) {
+      dataFile.println(dataString);
+      dataFile.close();
+      Serial.println(dataString);
+      lastReadTime =  millis();
+     }
+     // if the file isn't open, pop up an error:
+      else {
+        Serial.println("error opening datalog.txt");
+      }
+    }
+    //Serial.println(BPM);
     unsigned long currentMillis = millis();
     if (buttonState != lastButtonState) { 
        Serial.println("START");
